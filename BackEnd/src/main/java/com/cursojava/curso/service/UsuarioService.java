@@ -28,15 +28,14 @@ public class UsuarioService {
     public UsuarioDTO crear(Usuario usuario) {
         usuarioRepository.save(usuario);
         return new UsuarioDTO(
-                usuario.getId(),
                 usuario.getNombre(),
                 usuario.getCorreo(),
                 usuario.getRol()
         );
     }
 
-    public UsuarioDTO getUsuario(String id) {
-        return usuarioRepository.findById(id)
+    public UsuarioDTO getUsuario(String correo) {
+        return usuarioRepository.findByCorreo(correo)
                 .map(usuarioDTOMapper)
                 .orElse(null);
     }
@@ -48,8 +47,8 @@ public class UsuarioService {
                 .collect(Collectors.toList());
     }
 
-    public UsuarioDTO update(String id, Usuario usuarioUpdate) {
-        Optional<Usuario> dbResponse = usuarioRepository.findById(id);
+    public UsuarioDTO update(String correo, Usuario usuarioUpdate) {
+        Optional<Usuario> dbResponse = usuarioRepository.findByCorreo(correo);
         if (dbResponse.isPresent()) {
             Usuario usuario = dbResponse.get();
             usuario.setNombre(usuarioUpdate.getNombre());
@@ -58,7 +57,6 @@ public class UsuarioService {
             usuario.setRol(usuarioUpdate.getRol());
             usuarioRepository.save(usuario);
             return new UsuarioDTO(
-                    usuario.getId(),
                     usuario.getNombre(),
                     usuario.getCorreo(),
                     usuario.getRol()
@@ -68,8 +66,8 @@ public class UsuarioService {
         }
     }
 
-    public void delete(String id) throws Exception {
-        Optional<Usuario> dbResponse = usuarioRepository.findById(id);
+    public void delete(String correo) throws Exception {
+        Optional<Usuario> dbResponse = usuarioRepository.findByCorreo(correo);
         usuarioRepository.delete(dbResponse.orElseThrow(() -> new Exception("Usuario no encontrado"))
         );
     }
