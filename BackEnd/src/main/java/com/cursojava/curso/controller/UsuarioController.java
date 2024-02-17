@@ -11,7 +11,7 @@ import java.util.List;
 @RestController
 @RequestMapping("/usuarios")
 public class UsuarioController {
-    private UsuarioService usuarioService;
+    private final UsuarioService usuarioService;
 
 
     @Autowired
@@ -41,12 +41,7 @@ public class UsuarioController {
     }
 
     @DeleteMapping("/por-correo")
-    public String delete(@RequestParam String correo) {
-        try {
-            usuarioService.delete(correo);
-            return "Usuario eliminado";
-        } catch (Exception e) {
-            return e.getMessage();
-        }
+    public void delete(@RequestParam String correo) {
+        usuarioService.delete(correo);
     }
 }
