@@ -9,7 +9,6 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
-import java.util.Optional;
 import java.util.stream.Collectors;
 
 @Service
@@ -27,17 +26,13 @@ public class UsuarioService {
     @Transactional
     public UsuarioDTO crear(Usuario usuario) {
         usuarioRepository.save(usuario);
-        return new UsuarioDTO(
-                usuario.getNombre(),
-                usuario.getCorreo(),
-                usuario.getRol()
-        );
+        return usuarioToDto(usuario);
     }
 
     public UsuarioDTO getUsuario(String correo) {
         return usuarioRepository.findByCorreo(correo)
                 .map(usuarioDTOMapper)
-                .orElse(null);
+                .orElseThrow();
     }
 
     public List<UsuarioDTO> getUsuarios() {
@@ -48,27 +43,26 @@ public class UsuarioService {
     }
 
     public UsuarioDTO update(String correo, Usuario usuarioUpdate) {
-        Optional<Usuario> dbResponse = usuarioRepository.findByCorreo(correo);
-        if (dbResponse.isPresent()) {
-            Usuario usuario = dbResponse.get();
-            usuario.setNombre(usuarioUpdate.getNombre());
-            usuario.setCorreo(usuarioUpdate.getCorreo());
-            usuario.setPassword(usuarioUpdate.getPassword());
-            usuario.setRol(usuarioUpdate.getRol());
-            usuarioRepository.save(usuario);
-            return new UsuarioDTO(
-                    usuario.getNombre(),
-                    usuario.getCorreo(),
-                    usuario.getRol()
-            );
-        } else {
-            return null;
-        }
+        Usuario usuario = usuarioRepository.findByCorreo(correo).orElseThrow();
+        usuario.setNombre(usuarioUpdate.getNombre());
+        usuario.setCorreo(usuarioUpdate.getCorreo());
+        usuario.setPassword(usuarioUpdate.getPassword());
+        usuario.setRol(usuarioUpdate.getRol());
+
+        usuarioRepository.save(usuario);
+        return usuarioToDto(usuario);
     }
 
-    public void delete(String correo) throws Exception {
-        Optional<Usuario> dbResponse = usuarioRepository.findByCorreo(correo);
-        usuarioRepository.delete(dbResponse.orElseThrow(() -> new Exception("Usuario no encontrado"))
+    public void delete(String correo) {
+        Usuario usuario = usuarioRepository.findByCorreo(correo).orElseThrow();
+        usuarioRepository.delete(usuario);
+    }
+
+    private UsuarioDTO usuarioToDto(Usuario usuario) {
+        return new UsuarioDTO(
+                usuario.getNombre(),
+                usuario.getCorreo(),
+                usuario.getRol()
         );
     }
 }
