@@ -9,9 +9,9 @@ import org.springframework.web.bind.annotation.*;
 import java.util.List;
 
 @RestController
-@RequestMapping("/usuario")
+@RequestMapping("/usuarios")
 public class UsuarioController {
-    private UsuarioService usuarioService;
+    private final UsuarioService usuarioService;
 
 
     @Autowired
@@ -25,9 +25,9 @@ public class UsuarioController {
         return usuarioService.crear(usuario);
     }
 
-    @GetMapping("/{id}")
-    public UsuarioDTO getUsuario(@PathVariable String id) {
-        return usuarioService.getUsuario(id);
+    @GetMapping("/por-correo")
+    public UsuarioDTO getUsuario(@RequestParam String correo) {
+        return usuarioService.getUsuario(correo);
     }
 
     @GetMapping
@@ -35,18 +35,13 @@ public class UsuarioController {
         return usuarioService.getUsuarios();
     }
 
-    @PutMapping("/{id}")
-    public UsuarioDTO update(@PathVariable String id, @RequestBody Usuario usuario) {
-        return usuarioService.update(id, usuario);
+    @PutMapping("/por-correo")
+    public UsuarioDTO update(@RequestParam String correo, @RequestBody Usuario usuario) {
+        return usuarioService.update(correo, usuario);
     }
 
-    @DeleteMapping("/{id}")
-    public String delete(@PathVariable String id) {
-        try {
-            usuarioService.delete(id);
-            return "Usuario eliminado";
-        } catch (Exception e) {
-            return e.getMessage();
-        }
+    @DeleteMapping("/por-correo")
+    public void delete(@RequestParam String correo) {
+        usuarioService.delete(correo);
     }
 }
